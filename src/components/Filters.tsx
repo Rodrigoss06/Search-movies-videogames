@@ -143,8 +143,8 @@ function Filters() {
               <option value=""></option>
               {Array.from({ length: 26 }, (_, i) =>
                 String.fromCharCode(65 + i)
-              ).map((letter) => (
-                <option value={letter}>{letter.toUpperCase()}</option>
+              ).map((letter,index) => (
+                <option value={letter} key={index}>{letter.toUpperCase()}</option>
               ))}
             </select>
           </label>
@@ -152,8 +152,8 @@ function Filters() {
             Genre:
             <select name="genre" onChange={(e)=>setGenreSelect(e.target.value)} className="text-black rounded ml-2">
               <option value=""></option>
-              {genres?.map((genre) => (
-                <option value={genre}>{genre}</option>
+              {genres?.map((genre,index) => (
+                <option value={genre} key={index}>{genre}</option>
               ))}
             </select>
           </label>

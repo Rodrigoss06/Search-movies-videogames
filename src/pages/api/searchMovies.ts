@@ -118,7 +118,7 @@ export default async function handler(
   res.status(200).json({ movies: returnMovies });
 }
 
-async function getMovies(): Promise<Movie[] | undefined> {
+export async function getMovies(): Promise<Movie[] | undefined> {
   const pgp = pgPromise();
   const db = pgp(process.env.DATABASE_URL!);
   
@@ -141,11 +141,6 @@ async function getMovies(): Promise<Movie[] | undefined> {
   }
 }
 
-function esNumero(str: string): boolean {
-  const numero = parseFloat(str);
-
-  return !isNaN(numero);
-}
 
 function convertirTipoDato(value: any) {
   if (value === "True" || value === "False") {

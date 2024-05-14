@@ -56,8 +56,8 @@ function Results() {
       ) : resultsDisplayMode === "table" ? (searchData == "searchMovies"? (
         <div>
           {resultsMovies.slice(0,visibleResults).map((result: Movie)=>(
-            <article>
-              <TableMovie movie={result}/>
+            <article key={result.imdb_id}>
+              <TableMovie movie={result} />
             </article>
           ))}
           {resultsMovies.length > visibleResults && (
@@ -72,7 +72,7 @@ function Results() {
       ):(
         <div>
           {resultsGames.slice(0, visibleResults).map((result: VideoGame) => (
-            <article>
+            <article key={result.id}>
               <TableGame game={result} />
             </article>
           ))}
@@ -88,8 +88,8 @@ function Results() {
       )) : (
         <div className=" flex flex-wrap gap-3">
           {resultsGames.slice(0, visibleResults).map((result: VideoGame) => (
-            <article>
-              <MosaicGame game={result} />
+            <article key={result.id}>
+              <MosaicGame game={result}  />
             </article>
           ))}
           {resultsGames.length > visibleResults && (
