@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs/promises";
 import { Filter, Genre, Movie } from "@/types";
 import pgPromise from "pg-promise";
-
+import { getMovies } from "../../db";
 type Data = {
   error?: string;
   movies?: Movie[];
@@ -27,8 +27,6 @@ export default async function handler(
     return;
   }
   const movies = await getMovies();
-  
-  console.log("import date completed!!");
   const moviesFilter = movies?.filter((movie) => {
     const titleVerified =
       typeof movie.title === "string" &&
@@ -51,24 +49,21 @@ export default async function handler(
       }
       return 0;
     });
-    console.log(1);
   } else if (filter.orderValue === "vote_average") {
-    returnMovies = moviesFilter?.sort((a, b) => b.vote_average - a.vote_average);
-    console.log(2);
+    returnMovies = moviesFilter?.sort(
+      (a, b) => b.vote_average - a.vote_average
+    );
   } else if (filter.orderValue === "popularity") {
     returnMovies = moviesFilter?.sort((a, b) => b.popularity - a.popularity);
-    console.log(3);
   } else {
     // Si no se especifica un tipo de orden, se devuelve el arreglo sin ordenar
     returnMovies = moviesFilter;
   }
   if (filter.letter != "") {
-    console.log(4);
     returnMovies = returnMovies?.filter(
       (movie: Movie) =>
         movie.original_title[0]?.toLowerCase() == filter.letter.toLowerCase()
     );
-    console.log(filter.letter);
   }
   if (filter.genreSelect != "") {
     returnMovies = returnMovies?.filter((movie: Movie) => {
@@ -83,7 +78,6 @@ export default async function handler(
       }
       return false;
     });
-    console.log(filter.genreSelect);
   }
 
   if (filter.startDate != "" && filter.endDate != "") {
@@ -114,71 +108,5 @@ export default async function handler(
       return false;
     });
   }
-  // console.log(returnMovies);
   res.status(200).json({ movies: returnMovies });
-}
-
-export async function getMovies(): Promise<Movie[] | undefined> {
-  const pgp = pgPromise();
-  const db = pgp(process.env.DATABASE_URL!);
-  
-  try {
-    const data = await db.any("SELECT * FROM movies")
-    const convertedData = data.map(movie => {
-      // Iterar sobre cada atributo del objeto movie y aplicar convertirTipoDato
-      for (let key in movie) {
-        if (movie.hasOwnProperty(key)) {
-          movie[key] = convertirTipoDato(movie[key]);
-        }
-      }
-      return movie;
-    });
-    console.log(convertedData)
-    return convertedData;
-  } catch (error) {
-    console.error("Error al seleccionar datos de la tabla movies:", error);
-    return undefined
-  }
-}
-
-
-function convertirTipoDato(value: any) {
-  if (value === "True" || value === "False") {
-    return value === "True";
-  } else if (!isNaN(parseFloat(value))) {
-    return parseFloat(value);
-  } else if (
-    typeof value === "string" &&
-    value.startsWith("[") &&
-    value.endsWith("]")
-  ) {
-    try {
-      const array = [];
-      interface Acumulador {
-        claves: string[];
-        valores: any[];
-      }
-      const objetosConComillasCorregidas = value.replace(/'([^']*)'/g, '"$1"');
-
-      const objetosSeparados = objetosConComillasCorregidas
-        .slice(1, -1)
-        .match(/\{[^{}]+\}/g);
-      const resultado = objetosSeparados!.map((objeto: string) => {
-        try {
-          const objetoParseado: { [key: string]: any } = JSON.parse(objeto);
-          const objetoConClavesYValores: any = objetoParseado;
-          return objetoConClavesYValores;
-        } catch (error) {
-          // console.log(error);
-          // console.log(objeto)
-          return value;
-        }
-      });
-      return resultado;
-    } catch (error) {
-      return value;
-    }
-  } else {
-    return value;
-  }
 }

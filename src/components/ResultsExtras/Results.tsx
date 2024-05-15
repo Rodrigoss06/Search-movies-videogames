@@ -12,10 +12,6 @@ function Results() {
   const [resultsDisplayMode, setResultsDisplayMode] = useState("table");
 
   useEffect(() => {
-    console.log(resultsGames.length);
-    console.log(resultsGames);
-    console.log(resultsMovies.length)
-    console.log(resultsMovies)
     if (resultsGames.length >= 1 || resultsMovies.length >=1) {
       setLoading(false);
     }

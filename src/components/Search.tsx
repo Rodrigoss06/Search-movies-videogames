@@ -9,7 +9,6 @@ function Search() {
 
   const {filter,searchData,resultsMovies ,setResultsGames, setResultsMovies} = useResultsStore((state)=>state)
   const handleSubmit = async(e:FormEvent<HTMLFormElement>)=>{
-    console.log()
     e.preventDefault()
     try {
       const response = await axios.get(`/api/${searchData}`,{
@@ -20,14 +19,11 @@ function Search() {
       })
       console.log(response)
       if (searchData =="searchMovies") {
-        console.log(response.data.movies.length -1)
-        console.log(response.data.movies[response.data.movies.length-1])
         response.data.movies.forEach((movie:Movie) => {
           setResultsMovies([...resultsMovies, movie])
         });
         setResultsMovies(response.data.movies)
       } else {
-        console.log(response.data.games)
         setResultsGames(response.data.games)
       }
     } catch (error) {

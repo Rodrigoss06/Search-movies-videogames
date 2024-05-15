@@ -46,8 +46,6 @@ function Filters() {
     const newStartDate = event.target.value;
     const [year,month,day]=newStartDate.split("-").map((d)=>Number(d))
     const [endYear,endMonth,endDay]=endDate.split("-").map((d)=>Number(d))
-    console.log(endYear)
-    console.log(year)
     if (year <= endYear  && year>=1 && month>0 && day>0) {
       setStartDate(newStartDate);
     }
@@ -58,7 +56,6 @@ function Filters() {
     const [year,month,day]=newEndDate.split("-").map((d)=>Number(d))
     const [startYear,startMonth,startDay]=startDate.split("-").map((d)=>Number(d))
 
-    console.log(newEndDate)
     if (year >= startYear  && year<2025 && month>0 && day>0) {
       setEndDate(newEndDate);
     }
@@ -77,7 +74,6 @@ function Filters() {
         endDate
       }
     )
-    console.log(1232131231)
   }
 
   return (
@@ -89,7 +85,6 @@ function Filters() {
             className="py-3 mx-auto "
             onClick={() => {
               setSearchData("searchMovies");
-              console.log(1000);
             }}
           >
             Movies

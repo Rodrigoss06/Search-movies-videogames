@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs/promises";
 import { Genre, Movie } from "@/types";
-import { getMovies } from "./searchMovies";
+import { getMovies } from "../../db";
 type Data = {
   error?: string;
   genres?: string[]|undefined;
