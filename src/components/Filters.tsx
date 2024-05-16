@@ -9,16 +9,26 @@ function Filters() {
     resultsMovies,
     setResultsGames,
     setResultsMovies,
-    setFilter
+    setFilter,
   } = useResultsStore((state) => state);
   const [genres, setGenres] = useState<string[] | undefined>([]);
-  const [orderValue, setOrderValue] = useState("");
-  const [letter, setLetter] = useState("")
-  const [genreSelect, setGenreSelect] = useState("")
+  const [orderValue, setOrderValue] = useState("popularity");
+  const [letter, setLetter] = useState("");
+  const [genreSelect, setGenreSelect] = useState("");
   const [min, setMin] = useState(0);
   const [max, setMax] = useState(10);
   const [startDate, setStartDate] = useState("1874-12-08");
-  const [endDate, setEndDate] = useState(`${new Date().getFullYear()}-${new Date().getMonth()<10?"0"+new Date().getMonth():new Date().getMonth()}-${new Date().getDate()<10 ? "0"+new Date().getDate():new Date().getDate()}`);
+  const [endDate, setEndDate] = useState(
+    `${new Date().getFullYear()}-${
+      new Date().getMonth() < 10
+        ? "0" + new Date().getMonth()
+        : new Date().getMonth()
+    }-${
+      new Date().getDate() < 10
+        ? "0" + new Date().getDate()
+        : new Date().getDate()
+    }`
+  );
 
   useEffect(() => {
     const getGenres = async () => {
@@ -41,43 +51,48 @@ function Filters() {
       setMax(newMax);
     }
   };
-  
+
   const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newStartDate = event.target.value;
-    const [year,month,day]=newStartDate.split("-").map((d)=>Number(d))
-    const [endYear,endMonth,endDay]=endDate.split("-").map((d)=>Number(d))
-    if (year <= endYear  && year>=1 && month>0 && day>0) {
+    const [year, month, day] = newStartDate.split("-").map((d) => Number(d));
+    const [endYear, endMonth, endDay] = endDate
+      .split("-")
+      .map((d) => Number(d));
+    if (year <= endYear && year >= 1 && month > 0 && day > 0) {
       setStartDate(newStartDate);
     }
   };
 
   const handleEndDateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newEndDate = event.target.value;
-    const [year,month,day]=newEndDate.split("-").map((d)=>Number(d))
-    const [startYear,startMonth,startDay]=startDate.split("-").map((d)=>Number(d))
+    const [year, month, day] = newEndDate.split("-").map((d) => Number(d));
+    const [startYear, startMonth, startDay] = startDate
+      .split("-")
+      .map((d) => Number(d));
 
-    if (year >= startYear  && year<2025 && month>0 && day>0) {
+    if (year >= startYear && year < 2025 && month > 0 && day > 0) {
       setEndDate(newEndDate);
     }
   };
 
-  const handleSubmit = (e:FormEvent<HTMLFormElement>)=>{
-    e.preventDefault()
-    setFilter(
-      {
-        orderValue,
-        letter,
-        genreSelect,
-        min,
-        max,
-        startDate,
-        endDate
-      }
-    )
-  }
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFilter({
+      orderValue,
+      letter,
+      genreSelect,
+      min,
+      max,
+      startDate,
+      endDate,
+    });
+  };
 
   return (
-    <form className="text-white mx-1 border rounded p-2" onSubmit={handleSubmit}>
+    <form
+      className="text-white mx-1 border rounded p-2"
+      onSubmit={handleSubmit}
+    >
       <label>
         Search Data:
         <div className="border border-white  flex rounded">
@@ -89,7 +104,10 @@ function Filters() {
           >
             Movies
           </p>
-          <p className="py-3 mx-auto" onClick={() => setSearchData("searchVideogames")}>
+          <p
+            className="py-3 mx-auto"
+            onClick={() => setSearchData("searchVideogames")}
+          >
             Games
           </p>
         </div>
@@ -99,9 +117,9 @@ function Filters() {
           Order By:
           <label className="ml-2">
             <input
-              type="checkbox"
+              type="radio"
               name="Order_by"
-              onChange={(event)=>setOrderValue(event.target.value)}
+              onChange={(event) => setOrderValue(event.target.value)}
               checked={orderValue === "alphabetically"}
               value="alphabetically"
             />
@@ -109,9 +127,9 @@ function Filters() {
           </label>
           <label className="ml-2">
             <input
-              type="checkbox"
+              type="radio"
               name="Order_by"
-              onChange={(event)=>setOrderValue(event.target.value)}
+              onChange={(event) => setOrderValue(event.target.value)}
               checked={orderValue === "vote_average"}
               value="vote_average"
             />
@@ -119,9 +137,9 @@ function Filters() {
           </label>
           <label className="ml-2">
             <input
-              type="checkbox"
+              type="radio"
               name="Order_by"
-              onChange={(event)=>setOrderValue(event.target.value)}
+              onChange={(event) => setOrderValue(event.target.value)}
               checked={orderValue === "popularity"}
               value="popularity"
             />
@@ -134,21 +152,33 @@ function Filters() {
           Filter By:
           <label className="ml-2 mt-1">
             Letter:
-            <select name="letter" onChange={(e)=>setLetter(e.target.value)} className="text-black rounded ml-2">
+            <select
+              name="letter"
+              onChange={(e) => setLetter(e.target.value)}
+              className="text-black rounded ml-2"
+            >
               <option value=""></option>
               {Array.from({ length: 26 }, (_, i) =>
                 String.fromCharCode(65 + i)
-              ).map((letter,index) => (
-                <option value={letter} key={index}>{letter.toUpperCase()}</option>
+              ).map((letter, index) => (
+                <option value={letter} key={index}>
+                  {letter.toUpperCase()}
+                </option>
               ))}
             </select>
           </label>
           <label className="ml-2 mt-1">
             Genre:
-            <select name="genre" onChange={(e)=>setGenreSelect(e.target.value)} className="text-black rounded ml-2">
+            <select
+              name="genre"
+              onChange={(e) => setGenreSelect(e.target.value)}
+              className="text-black rounded ml-2"
+            >
               <option value=""></option>
-              {genres?.map((genre,index) => (
-                <option value={genre} key={index}>{genre}</option>
+              {genres?.map((genre, index) => (
+                <option value={genre} key={index}>
+                  {genre}
+                </option>
               ))}
             </select>
           </label>
@@ -156,15 +186,15 @@ function Filters() {
             Release:
             <label className=" ml-2">
               <input
-              value={startDate}
-              onChange={handleStartDateChange}
+                value={startDate}
+                onChange={handleStartDateChange}
                 type="date"
                 className="text-black pl-1 text-center rounded mx-2"
               />
               to
               <input
-              value={endDate}
-              onChange={handleEndDateChange}
+                value={endDate}
+                onChange={handleEndDateChange}
                 type="date"
                 className="text-black pl-1 text-center rounded mx-2"
               />
@@ -191,8 +221,13 @@ function Filters() {
           </label>
         </label>
       )}
-      {searchData=="searchMovies" && (
-        <button type="submit" className="px-2 py-1 w-full mx-1 mt-4 border border-white border-solid">Filter</button>
+      {searchData == "searchMovies" && (
+        <button
+          type="submit"
+          className="px-2 py-1 w-full mx-1 mt-4 border border-white border-solid"
+        >
+          Filter
+        </button>
       )}
     </form>
   );

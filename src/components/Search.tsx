@@ -19,9 +19,6 @@ function Search() {
       })
       console.log(response)
       if (searchData =="searchMovies") {
-        response.data.movies.forEach((movie:Movie) => {
-          setResultsMovies([...resultsMovies, movie])
-        });
         setResultsMovies(response.data.movies)
       } else {
         setResultsGames(response.data.games)

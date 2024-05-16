@@ -18,7 +18,7 @@ export const useResultsStore= create<Store>((set) =>({
     resultsMovies: [],
     searchData: "searchMovies",
     filter:{
-        orderValue: "",
+        orderValue: "popularity",
         letter: "",
         genreSelect: "",
         min: 0,

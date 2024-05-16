@@ -1,9 +1,4 @@
 import pgPromise from 'pg-promise';
-import dotenv from 'dotenv';
-import { Movie } from './types';
-
-// Carga las variables de entorno
-dotenv.config();
 
 const pgp = pgPromise();
 
@@ -11,7 +6,6 @@ const db = pgp({
   connectionString: process.env.RENDER_DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
-// Función para verificar la conexión
 export async function verifyConnection() {
   try {
     await db.connect();
@@ -22,12 +16,10 @@ export async function verifyConnection() {
 }
 
 
-// Función para obtener todas las películas
 export async function getMovies() {
     try {
         const data = await db.any("SELECT * FROM movies");
         const convertedData = data.map((movie) => {
-          // Iterar sobre cada atributo del objeto movie y aplicar convertirTipoDato
           for (let key in movie) {
             if (movie.hasOwnProperty(key)) {
               movie[key] = convertirTipoDato(movie[key]);
@@ -68,7 +60,6 @@ function convertirTipoDato(value: any) {
             const objetoConClavesYValores: any = objetoParseado;
             return objetoConClavesYValores;
           } catch (error) {
-            console.log(error);
             return value;
           }
         });

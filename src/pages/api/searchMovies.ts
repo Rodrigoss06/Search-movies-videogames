@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs/promises";
 import { Filter, Genre, Movie } from "@/types";
-import pgPromise from "pg-promise";
 import { getMovies } from "../../db";
 type Data = {
   error?: string;
@@ -13,7 +11,7 @@ type Params = {
 };
 export const config = {
   api: {
-    responseLimit: "100mb",
+    responseLimit: "5mb",
   },
 };
 export default async function handler(
@@ -108,5 +106,7 @@ export default async function handler(
       return false;
     });
   }
+  const maxItems = 1000; 
+  returnMovies = returnMovies?.slice(0, maxItems)
   res.status(200).json({ movies: returnMovies });
 }
