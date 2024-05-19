@@ -4,7 +4,7 @@ import React from 'react'
 interface Props {
     movie: Movie
 }
-function TableMovie({movie}:Props) {
+function TableItemMovie({movie}:Props) {
     const {resultsMovies} = useResultsStore((state)=>state)
   return (
     <div
@@ -35,4 +35,4 @@ function TableMovie({movie}:Props) {
   )
 }
 
-export default TableMovie
+export default TableItemMovie

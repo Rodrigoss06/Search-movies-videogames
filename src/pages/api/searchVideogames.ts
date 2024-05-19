@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import {Filter, type VideoGames } from "@/types";
+import { GenreGame, ParentPlatform, Platform, VideoGame, type FilterGames, type VideoGames } from "@/types";
 import axios from "axios";
 type Data = {
   error?: string;
@@ -15,20 +15,68 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { searchData, filterString }: Params = req.query;
-  const filter: Filter = JSON.parse(filterString!);
+  const filter: FilterGames = JSON.parse(filterString!);
   if (typeof searchData !== "string" || typeof filter === "undefined") {
     res.status(400).json({ error: "Parámetros de consulta inválidos" });
     return;
   }
-  const gamesPage_1 = await getGames(process.env.API_KEY_RAWG!, searchData);
+  console.log(filter)
+  const gamesPage_1 = await getGames(searchData);
   const gamesPage_2 = await getNextGames(gamesPage_1.next);
-  const games = gamesPage_1.results.concat(gamesPage_2.results);
-  sort(games);
+  const gamesPage_3 = await getNextGames(gamesPage_2.next);
+  const gamesPage_4 = await getNextGames(gamesPage_3.next);
+  const gamesPage_5 = await getNextGames(gamesPage_4.next);
+  const gamesPage_6 = await getNextGames(gamesPage_5.next);
 
-  res.status(200).json({ games: games });
+  const games = [
+    ...gamesPage_1.results,
+    ...gamesPage_2.results,
+    ...gamesPage_3.results,
+    ...gamesPage_4.results,
+    ...gamesPage_5.results,
+    ...gamesPage_6.results,
+  ];
+  const sortGames =sort(games, filter.orderValueVideogame);
+  let returnGames = sortGames;
+  if (filter.genreVideogameSelect !== "") {
+    console.log(1)
+    returnGames = returnGames.filter((game:VideoGame)=> game.genres?.some(
+      (genre: GenreGame) => genre.name === filter.genreVideogameSelect
+    ))
+    console.log(returnGames)
+  }
+  if (filter.platformSelect !=="") {
+    returnGames = returnGames.filter((game:VideoGame)=> {
+      
+      if (typeof game.parent_platforms !== "undefined" && game.parent_platforms.length !==0) {
+        return game.parent_platforms.some(
+          (platform:ParentPlatform)=> platform.platform.name === filter.platformSelect
+        )
+      }
+    })
+  }
+  if (filter.startDateGame !=="" && filter.endDateGame !== "") {
+    returnGames = returnGames.filter((game: VideoGame) => {
+      if (!game.released) {
+        return false;
+      }
+      const [startYear, startMounth, startDay] = filter.startDateGame.split("-");
+      const [endYear, endMounth, endDay] = filter.endDateGame.split("-");
+      const [YearGame, MounthGame, DayGame] = game.released.split("-");
+      if (
+        Number(YearGame) >= Number(startYear) &&
+        Number(YearGame) <= Number(endYear)
+      ) {
+        return true;
+      }
+      return false;
+    });
+  }
+  console.log(returnGames)
+  res.status(200).json({ games: returnGames });
 }
 
-async function getGames(key: string, searchData: string) {
+async function getGames(searchData: string) {
   try {
     const response = await axios.get("https://api.rawg.io/api/games", {
       params: {
@@ -51,24 +99,24 @@ async function getNextGames(url: string) {
   }
 }
 
-function sort(arr: VideoGames) {
-  let swapped = false;
-  for (let i = 0; i < arr.length - 1; i++) {
-    for (let k = 0; k < arr.length - i - 1; k++) {
-      const metacritic = arr[k].metacritic ? arr[k].metacritic : 0;
-      const metacritic2 = arr[k + 1].metacritic ? arr[k + 1].metacritic : -1;
-
-      if (metacritic < metacritic2) {
-        const temp = arr[k];
-        arr[k] = arr[k + 1];
-        arr[k + 1] = temp;
-        swapped = true;
+function sort(arr: VideoGames, orderSetting: string) {
+  let sortGames;
+  console.log(orderSetting)
+  if (orderSetting === "alphabetically") {
+    sortGames = arr.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
       }
-    }
-    if (!swapped) {
-      console.log(arr);
-      return;
-    }
+      if (a.name > b.name) {
+        return 1;
+      }
+      return 0;
+    });
+  } else if (orderSetting === "rating") {
+    sortGames = arr.sort((a,b)=> b.rating - a.rating)
+  } else {
+    sortGames = arr.sort((a,b)=>b.ratings_count - a.ratings_count)
   }
-  console.log(arr);
+  console.log(sortGames)
+  return sortGames
 }

@@ -8,7 +8,7 @@ type Data = {
 };
 export const config = {
   api: {
-    responseLimit: "100mb",
+    responseLimit: "5mb",
   },
 };
 export default async function handler(

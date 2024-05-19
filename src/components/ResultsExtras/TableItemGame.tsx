@@ -4,7 +4,7 @@ import { useResultsStore } from "@/resultsStore";
 interface Props {
   game: VideoGame;
 }
-function TableGame({ game }: Props) {
+function TableItemGame({ game }: Props) {
   const { resultsGames } = useResultsStore((state) => state);
 
   return (
@@ -29,11 +29,11 @@ function TableGame({ game }: Props) {
       )}
       
         <span className="flex justify-start ml-3 items-center overflow-hidden text-pretty">
-          {game.metacritic? game.metacritic : "-"}
+          {game.rating? game.rating : "-"}
         </span>
      
     </div>
   );
 }
 
-export default TableGame;
+export default TableItemGame;

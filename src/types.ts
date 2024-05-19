@@ -31,7 +31,7 @@ export interface VideoGame {
   dominant_color: string
   short_screenshots: ShortScreenshot[]
   parent_platforms: ParentPlatform[]
-  genres: Genre[]
+  genres: GenreGame[]
 }
 
 export interface Platform {
@@ -80,7 +80,7 @@ export interface Platform3 {
   name: string
   slug: string
 }
-export interface Genre {
+export interface GenreGame {
   id: number
   name: string
   slug: string
@@ -152,4 +152,12 @@ export interface Filter {
   max: number;
   startDate: string;
   endDate: string;
+}
+
+export interface FilterGames {
+  orderValueVideogame: string;
+  platformSelect: string;
+  genreVideogameSelect: string;
+  startDateGame: string;
+  endDateGame: string;
 }

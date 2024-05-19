@@ -11,6 +11,7 @@ function Filters() {
     setResultsMovies,
     setFilter,
   } = useResultsStore((state) => state);
+  //filter for movies
   const [genres, setGenres] = useState<string[] | undefined>([]);
   const [orderValue, setOrderValue] = useState("popularity");
   const [letter, setLetter] = useState("");
@@ -30,27 +31,57 @@ function Filters() {
     }`
   );
 
-  useEffect(() => {
-    const getGenres = async () => {
-      const response = await axios.get("/api/moviesGenres");
-      setGenres(response.data.genres);
-    };
-    getGenres();
-  }, []);
-
   const handleMinChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newMin = Number(event.target.value);
     if (!isNaN(newMin) && newMin >= 0 && newMin < max) {
       setMin(newMin);
     }
   };
-
   const handleMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newMax = Number(event.target.value);
     if (!isNaN(newMax) && newMax >= 0 && newMax > min && newMax < 11) {
       setMax(newMax);
     }
   };
+  
+  //filter for videogames
+  const [genresVideogame, setGenresVideogame] = useState<string[] | undefined>([]);
+  const [platforms, setPlatforms] = useState<string[] | undefined>([]);
+  const [orderValueVideogame, setOrderValueVideogame] = useState("rating");
+  const [platformSelect, setPlatformSelect] = useState("");
+  const [genreVideogameSelect, setGenreVideogameSelect] = useState("");
+  const [startDateGame, setStartDateGame] = useState("1874-12-08");
+  const [endDateGame, setEndDateGame] = useState(
+    `${new Date().getFullYear()}-${
+      new Date().getMonth() < 10
+      ? "0" + new Date().getMonth()
+      : new Date().getMonth()
+    }-${
+      new Date().getDate() < 10
+      ? "0" + new Date().getDate()
+      : new Date().getDate()
+    }`
+  );
+
+  useEffect(() => {
+    const getGenres = async () => {
+      const response = await axios.get("/api/moviesGenres");
+      setGenres(response.data.genres);
+    };
+    const getPlatformsGames = async () => {
+      const response = await axios.get("api/videogamesPlatforms");
+      console.log(response.data.platforms)
+      setPlatforms(response.data.platforms);
+    };
+    const getGenresVideogames = async () => {
+      const response = await axios.get("api/videogamesGenres");
+      console.log(response.data.genres)
+      setGenresVideogame(response.data.genres);
+    };
+    getGenres();
+    getPlatformsGames();
+    getGenresVideogames();
+  }, []);
 
   const handleStartDateChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newStartDate = event.target.value;
@@ -59,7 +90,7 @@ function Filters() {
       .split("-")
       .map((d) => Number(d));
     if (year <= endYear && year >= 1 && month > 0 && day > 0) {
-      setStartDate(newStartDate);
+      searchData === "searchMovies"? setStartDate(newStartDate): setStartDateGame(newStartDate)
     }
   };
 
@@ -71,25 +102,35 @@ function Filters() {
       .map((d) => Number(d));
 
     if (year >= startYear && year < 2025 && month > 0 && day > 0) {
-      setEndDate(newEndDate);
+      searchData === "searchMovies"? setEndDate(newEndDate) : setEndDateGame(newEndDate)
+    }
+  };
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchData ==="searchMovies") {
+      setFilter({
+        orderValue,
+        letter,
+        genreSelect,
+        min,
+        max,
+        startDate,
+        endDate,
+      });
+    } else {
+      setFilter({
+        orderValueVideogame,
+        platformSelect,
+        genreVideogameSelect,
+        startDateGame,
+        endDateGame,
+      });
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFilter({
-      orderValue,
-      letter,
-      genreSelect,
-      min,
-      max,
-      startDate,
-      endDate,
-    });
-  };
-
   return (
-    <form
+    <div>
+      <form
       className="text-white mx-1 border rounded p-2"
       onSubmit={handleSubmit}
     >
@@ -99,6 +140,15 @@ function Filters() {
           <p
             className="py-3 mx-auto "
             onClick={() => {
+              setFilter({
+                orderValue,
+                letter,
+                genreSelect,
+                min,
+                max,
+                startDate,
+                endDate,
+              });
               setSearchData("searchMovies");
             }}
           >
@@ -106,13 +156,22 @@ function Filters() {
           </p>
           <p
             className="py-3 mx-auto"
-            onClick={() => setSearchData("searchVideogames")}
+            onClick={() => {
+              setFilter({
+                orderValueVideogame,
+                platformSelect,
+                genreVideogameSelect,
+                startDateGame,
+                endDateGame,
+              });
+              setSearchData("searchVideogames")
+            }}
           >
             Games
           </p>
         </div>
       </label>
-      {searchData == "searchMovies" && (
+      {searchData == "searchMovies" ? (
         <label className="flex flex-col mx-2 gap-1">
           Order By:
           <label className="ml-2">
@@ -146,8 +205,40 @@ function Filters() {
             Popularity
           </label>
         </label>
-      )}
-      {searchData === "searchMovies" && (
+      ):( <label className="flex flex-col mx-2 gap-1">
+      Order By:
+      <label className="ml-2">
+        <input
+          type="radio"
+          name="Order_by"
+          onChange={(event) => setOrderValueVideogame(event.target.value)}
+          checked={orderValueVideogame === "alphabetically"}
+          value="alphabetically"
+        />
+        Alphabetically
+      </label>
+      <label className="ml-2">
+        <input
+          type="radio"
+          name="Order_by"
+          onChange={(event) => setOrderValueVideogame(event.target.value)}
+          checked={orderValueVideogame === "rating"}
+          value="rating"
+        />
+        Rating 
+      </label>
+      <label className="ml-2">
+        <input
+          type="radio"
+          name="Order_by"
+          onChange={(event) => setOrderValueVideogame(event.target.value)}
+          checked={orderValueVideogame === "number_reviews"}
+          value="number_reviews"
+        />
+        Number of Reviews
+      </label>
+    </label>)}
+      {searchData === "searchMovies" ? (
         <label className="flex flex-col gap-2">
           Filter By:
           <label className="ml-2 mt-1">
@@ -220,16 +311,65 @@ function Filters() {
             </label>
           </label>
         </label>
-      )}
-      {searchData == "searchMovies" && (
+      ): (<label className="flex flex-col gap-2">
+      Filter By:
+      <label className="ml-2 mt-1">
+        Platform:
+        <select
+          name="platform"
+          onChange={(e) => setPlatformSelect(e.target.value)}
+          className="text-black rounded ml-2"
+        >
+          <option value=""></option>
+          {platforms && platforms.map((platform, index) => (
+            <option value={platform} key={index}>
+              {platform}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="ml-2 mt-1">
+        Genre:
+        <select
+          name="genreVideogame"
+          onChange={(e) => setGenreVideogameSelect(e.target.value)}
+          className="text-black rounded ml-2"
+        >
+          <option value=""></option>
+          {genresVideogame?.map((genre, index) => (
+            <option value={genre} key={index}>
+              {genre}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="ml-2 mt-1 flex flex-col ">
+        Release:
+        <label className=" ml-2">
+          <input
+            value={startDateGame}
+            onChange={handleStartDateChange}
+            type="date"
+            className="text-black pl-1 text-center rounded mx-2"
+          />
+          to
+          <input
+            value={endDateGame}
+            onChange={handleEndDateChange}
+            type="date"
+            className="text-black pl-1 text-center rounded mx-2"
+          />
+        </label>
+      </label>
+    </label>)}
         <button
           type="submit"
-          className="px-2 py-1 w-full mx-1 mt-4 border border-white border-solid"
+          className="px-2 py-1 w-full mr-1 mt-4 border border-white border-solid"
         >
           Filter
         </button>
-      )}
     </form>
+    </div>
   );
 }
 

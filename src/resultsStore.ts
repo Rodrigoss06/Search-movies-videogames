@@ -1,16 +1,16 @@
 import { create } from "zustand"; //El estado se puede leer desde un archivo .jsx, .svelte, etc
-import {Filter, type Movie, type VideoGames } from '@/types';
+import {Filter, FilterGames, type Movie, type VideoGames } from '@/types';
 
 
 interface Store {
     resultsGames: VideoGames,
     resultsMovies: Movie[],
     searchData:string,
-    filter:Filter,
+    filter:Filter|FilterGames,
     setResultsGames:(results:VideoGames)=>void,
     setResultsMovies:(results:Movie[])=>void,
     setSearchData:(search:string)=>void
-    setFilter:(filter:Filter)=>void
+    setFilter:(filter:Filter|FilterGames)=>void
 
 }
 export const useResultsStore= create<Store>((set) =>({
@@ -29,6 +29,6 @@ export const useResultsStore= create<Store>((set) =>({
     setResultsGames: (resultsGames:VideoGames) => set({resultsGames}),
     setResultsMovies: (resultsMovies:Movie[]) => set({resultsMovies}),
     setSearchData:(searchData:string)=>set({searchData}),
-    setFilter:(filter:Filter)=>set({filter})
+    setFilter:(filter:Filter|FilterGames)=>set({filter})
 }))
 
